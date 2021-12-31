@@ -341,21 +341,18 @@ lists all packages available."""
         self, io: "IO", package: "Package", installed_repo: "Repository"
     ) -> None:
         io.write(f"<c1>{package.pretty_name}</c1>")
-        description = ""
-        if package.description:
-            description = " " + package.description
-
+        description = " " + package.description if package.description else ""
         io.write_line(f" <b>{package.pretty_version}</b>{description}")
 
         dependencies = package.requires
         dependencies = sorted(dependencies, key=lambda x: x.name)
         tree_bar = "├"
         total = len(dependencies)
+        level = 1
         for i, dependency in enumerate(dependencies, 1):
             if i == total:
                 tree_bar = "└"
 
-            level = 1
             color = self.colors[level]
             info = f"{tree_bar}── <{color}>{dependency.name}</{color}> {dependency.pretty_constraint}"
             self._write_tree_line(io, info)

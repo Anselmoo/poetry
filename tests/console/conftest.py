@@ -116,9 +116,7 @@ def poetry(
 
 @pytest.fixture
 def app(poetry: "Poetry") -> PoetryTestApplication:
-    app_ = PoetryTestApplication(poetry)
-
-    return app_
+    return PoetryTestApplication(poetry)
 
 
 @pytest.fixture

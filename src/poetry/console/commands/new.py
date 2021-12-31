@@ -33,11 +33,7 @@ class NewCommand(Command):
         from poetry.layouts import layout
         from poetry.utils.env import SystemEnv
 
-        if self.option("src"):
-            layout_ = layout("src")
-        else:
-            layout_ = layout("standard")
-
+        layout_ = layout("src") if self.option("src") else layout("standard")
         path = Path(self.argument("path"))
         if not path.is_absolute():
             # we do not use resolve here due to compatibility issues for path.resolve(strict=False)

@@ -37,9 +37,7 @@ class RunCommand(EnvCommand):
         poetry = self.poetry
         package = poetry.package
         path = poetry.file.parent
-        module = Module(package.name, path.as_posix(), package.packages)
-
-        return module
+        return Module(package.name, path.as_posix(), package.packages)
 
     def run_script(self, script: Union[str, dict], args: str) -> Any:
         if isinstance(script, dict):

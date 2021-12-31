@@ -66,13 +66,12 @@ patch, minor, major, prepatch, preminor, premajor, prerelease.
             poetry_content["version"] = version.text
 
             self.poetry.file.write(content)
+        elif self.option("short"):
+            self.line(self.poetry.package.pretty_version)
         else:
-            if self.option("short"):
-                self.line(self.poetry.package.pretty_version)
-            else:
-                self.line(
-                    f"<comment>{self.poetry.package.name}</> <info>{self.poetry.package.pretty_version}</>"
-                )
+            self.line(
+                f"<comment>{self.poetry.package.name}</> <info>{self.poetry.package.pretty_version}</>"
+            )
 
     def increment_version(self, version: str, rule: str) -> "Version":
         from poetry.core.semver.version import Version

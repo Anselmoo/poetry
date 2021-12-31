@@ -96,7 +96,7 @@ def test_remove_multiple(
     venv_cache: "Path",
 ):
     expected = {""}
-    removed_envs = venvs_in_cache_dirs[0:2]
+    removed_envs = venvs_in_cache_dirs[:2]
     remaining_envs = venvs_in_cache_dirs[2:]
     tester.execute(" ".join(removed_envs))
     for name in removed_envs:

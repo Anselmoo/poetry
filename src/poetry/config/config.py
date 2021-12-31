@@ -22,7 +22,7 @@ def boolean_validator(val: str) -> bool:
 
 
 def boolean_normalizer(val: str) -> bool:
-    return val in ["true", "1"]
+    return val in {"true", "1"}
 
 
 def int_normalizer(val: str) -> int:
@@ -86,10 +86,7 @@ class Config:
             for key in config:
                 value = self.get(parent_key + key)
                 if isinstance(value, dict):
-                    if parent_key != "":
-                        current_parent = parent_key + key + "."
-                    else:
-                        current_parent = key + "."
+                    current_parent = parent_key + key + "." if parent_key != "" else key + "."
                     all_[key] = _all(config[key], parent_key=current_parent)
                     continue
 

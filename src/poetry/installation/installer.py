@@ -521,11 +521,7 @@ class Installer:
     def _filter_operations(self, ops: Sequence["Operation"], repo: Repository) -> None:
         extra_packages = self._get_extra_packages(repo)
         for op in ops:
-            if isinstance(op, Update):
-                package = op.target_package
-            else:
-                package = op.package
-
+            package = op.target_package if isinstance(op, Update) else op.package
             if op.job_type == "uninstall":
                 continue
 
@@ -533,12 +529,11 @@ class Installer:
                 op.skip("Not needed for the current environment")
                 continue
 
+            extras = {}
             if self._update:
-                extras = {}
                 for extra, deps in self._package.extras.items():
                     extras[extra] = [dep.name for dep in deps]
             else:
-                extras = {}
                 for extra, deps in self._locker.lock_data.get("extras", {}).items():
                     extras[extra] = [dep.lower() for dep in deps]
 

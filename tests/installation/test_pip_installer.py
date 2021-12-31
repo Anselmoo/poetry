@@ -23,15 +23,13 @@ if TYPE_CHECKING:
 
 @pytest.fixture
 def package_git() -> Package:
-    package = Package(
+    return Package(
         "demo",
         "1.0.0",
         source_type="git",
         source_url="git@github.com:demo/demo.git",
         source_reference="master",
     )
-
-    return package
 
 
 @pytest.fixture

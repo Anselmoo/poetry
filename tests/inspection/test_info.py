@@ -209,8 +209,7 @@ def test_info_setup_complex_disable_build(
 def test_info_setup_missing_mandatory_should_trigger_pep517(
     mocker: "MockerFixture", source_dir: Path, missing: str
 ):
-    setup = "from setuptools import setup; "
-    setup += "setup("
+    setup = "from setuptools import setup; " + "setup("
     setup += 'name="demo", ' if missing != "name" else ""
     setup += 'version="0.1.0", ' if missing != "version" else ""
     setup += 'install_requires=["package"]' if missing != "install_requires" else ""

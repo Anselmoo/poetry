@@ -44,11 +44,7 @@ class RunArgvInput(ArgvInput):
                 # Options with values:
                 # For long options, test for '--option=' at beginning
                 # For short options, test for '-o' at beginning
-                if value.find("--") == 0:
-                    leading = value + "="
-                else:
-                    leading = value
-
+                leading = value + "=" if value.find("--") == 0 else value
                 if token == value or leading != "" and token.find(leading) == 0:
                     return True
 

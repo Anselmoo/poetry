@@ -884,8 +884,8 @@ class Installer:
         if poetry_path in path:
             path = path.replace(POETRY_BIN + ";", "")
 
-            if poetry_path in path:
-                path = path.replace(POETRY_BIN, "")
+        if poetry_path in path:
+            path = path.replace(POETRY_BIN, "")
 
         self.set_windows_path_var(path)
 
@@ -921,9 +921,7 @@ class Installer:
 
     def get_export_string(self):
         path = POETRY_BIN.replace(os.getenv("HOME", ""), "$HOME")
-        export_string = 'export PATH="{}:$PATH"'.format(path)
-
-        return export_string
+        return 'export PATH="{}:$PATH"'.format(path)
 
     def get_unix_profiles(self):
         profiles = [os.path.join(HOME, ".profile")]
@@ -951,19 +949,18 @@ class Installer:
 
         if not self._modify_path:
             kwargs["platform_msg"] = PRE_MESSAGE_NO_MODIFY_PATH
+        elif "fish" in SHELL:
+            kwargs["platform_msg"] = PRE_MESSAGE_FISH
+        elif WINDOWS:
+            kwargs["platform_msg"] = PRE_MESSAGE_WINDOWS
         else:
-            if "fish" in SHELL:
-                kwargs["platform_msg"] = PRE_MESSAGE_FISH
-            elif WINDOWS:
-                kwargs["platform_msg"] = PRE_MESSAGE_WINDOWS
-            else:
-                profiles = [
-                    colorize("comment", p.replace(os.getenv("HOME", ""), "$HOME"))
-                    for p in self.get_unix_profiles()
-                ]
-                kwargs["platform_msg"] = PRE_MESSAGE_UNIX.format(
-                    rcfiles="\n".join(profiles), plural="s" if len(profiles) > 1 else ""
-                )
+            profiles = [
+                colorize("comment", p.replace(os.getenv("HOME", ""), "$HOME"))
+                for p in self.get_unix_profiles()
+            ]
+            kwargs["platform_msg"] = PRE_MESSAGE_UNIX.format(
+                rcfiles="\n".join(profiles), plural="s" if len(profiles) > 1 else ""
+            )
 
         print(PRE_MESSAGE.format(**kwargs))
 

@@ -33,11 +33,7 @@ class MockRepository(PyPiRepository):
     def _get(self, url: str) -> Optional[Dict]:
         parts = url.split("/")[1:]
         name = parts[0]
-        if len(parts) == 3:
-            version = parts[1]
-        else:
-            version = None
-
+        version = parts[1] if len(parts) == 3 else None
         if not version:
             fixture = self.JSON_FIXTURES / (name + ".json")
         else:
@@ -198,7 +194,7 @@ def test_pypi_repository_supports_reading_bz2_files():
         ]
     }
 
-    for name in expected_extras.keys():
+    for name in expected_extras:
         assert expected_extras[name] == sorted(
             package.extras[name], key=lambda r: r.name
         )

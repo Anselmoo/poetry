@@ -120,12 +120,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.rst")) as r_file:
 
 
 def run_setup(with_cext):
-    kwargs = {}
-    if with_cext:
-        kwargs["ext_modules"] = ext_modules
-    else:
-        kwargs["ext_modules"] = []
-
+    kwargs = {'ext_modules': ext_modules if with_cext else []}
     setup(
         name="SQLAlchemy",
         version=VERSION,

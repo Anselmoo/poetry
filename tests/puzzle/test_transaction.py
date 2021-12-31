@@ -31,10 +31,7 @@ def check_operations(
                 }
             )
         else:
-            job = "install"
-            if op.job_type == "uninstall":
-                job = "remove"
-
+            job = "remove" if op.job_type == "uninstall" else "install"
             result.append({"job": job, "package": op.package, "skipped": op.skipped})
 
     assert expected == result

@@ -92,11 +92,10 @@ class Layout:
 
         if self.basedir != Path():
             package.append("from", self.basedir.as_posix())
-        else:
-            if include == self._project:
-                # package include and package name are the same,
-                # packages table is redundant here.
-                return None
+        elif include == self._project:
+            # package include and package name are the same,
+            # packages table is redundant here.
+            return None
 
         return package
 

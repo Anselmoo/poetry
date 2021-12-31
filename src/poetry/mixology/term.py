@@ -68,7 +68,6 @@ class Term:
                 if not self.constraint.allows_any(other_constraint):
                     return SetRelation.DISJOINT
 
-                return SetRelation.OVERLAPPING
             else:
                 if not self._compatible_dependency(other.dependency):
                     return SetRelation.OVERLAPPING
@@ -77,35 +76,28 @@ class Term:
                 if self.constraint.allows_all(other_constraint):
                     return SetRelation.DISJOINT
 
-                # not foo ^1.5.0 overlaps foo ^1.0.0
-                # not foo ^2.0.0 is a superset of foo ^1.5.0
-                return SetRelation.OVERLAPPING
+        elif self.is_positive():
+            if not self._compatible_dependency(other.dependency):
+                return SetRelation.SUBSET
+
+            # foo ^2.0.0 is a subset of not foo ^1.0.0
+            if not other_constraint.allows_any(self.constraint):
+                return SetRelation.SUBSET
+
+            # foo ^1.5.0 is disjoint with not foo ^1.0.0
+            if other_constraint.allows_all(self.constraint):
+                return SetRelation.DISJOINT
+
         else:
-            if self.is_positive():
-                if not self._compatible_dependency(other.dependency):
-                    return SetRelation.SUBSET
-
-                # foo ^2.0.0 is a subset of not foo ^1.0.0
-                if not other_constraint.allows_any(self.constraint):
-                    return SetRelation.SUBSET
-
-                # foo ^1.5.0 is disjoint with not foo ^1.0.0
-                if other_constraint.allows_all(self.constraint):
-                    return SetRelation.DISJOINT
-
-                # foo ^1.0.0 overlaps not foo ^1.5.0
+            if not self._compatible_dependency(other.dependency):
                 return SetRelation.OVERLAPPING
-            else:
-                if not self._compatible_dependency(other.dependency):
-                    return SetRelation.OVERLAPPING
 
-                # not foo ^1.0.0 is a subset of not foo ^1.5.0
-                if self.constraint.allows_all(other_constraint):
-                    return SetRelation.SUBSET
+            # not foo ^1.0.0 is a subset of not foo ^1.5.0
+            if self.constraint.allows_all(other_constraint):
+                return SetRelation.SUBSET
 
-                # not foo ^2.0.0 overlaps not foo ^1.0.0
-                # not foo ^1.5.0 is a superset of not foo ^1.0.0
-                return SetRelation.OVERLAPPING
+
+        return SetRelation.OVERLAPPING
 
     def intersect(self, other: "Term") -> Optional["Term"]:
         """

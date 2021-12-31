@@ -232,19 +232,18 @@ class Executor:
                         self._sections[id(operation)].write_line(
                             f"  <fg=blue;options=bold>•</> {op_message}: <fg=blue>Pending...</>"
                         )
-            else:
-                if self._should_write_operation(operation):
-                    if not operation.skipped:
-                        self._io.write_line(
-                            f"  <fg=blue;options=bold>•</> {op_message}"
-                        )
-                    else:
-                        self._io.write_line(
-                            f"  <fg=default;options=bold,dark>•</> {op_message}: "
-                            "<fg=default;options=bold,dark>Skipped</> "
-                            "<fg=default;options=dark>for the following reason:</> "
-                            f"<fg=default;options=bold,dark>{operation.skip_reason}</>"
-                        )
+            elif self._should_write_operation(operation):
+                if not operation.skipped:
+                    self._io.write_line(
+                        f"  <fg=blue;options=bold>•</> {op_message}"
+                    )
+                else:
+                    self._io.write_line(
+                        f"  <fg=default;options=bold,dark>•</> {op_message}: "
+                        "<fg=default;options=bold,dark>Skipped</> "
+                        "<fg=default;options=dark>for the following reason:</> "
+                        f"<fg=default;options=bold,dark>{operation.skip_reason}</>"
+                    )
 
             try:
                 result = self._do_execute_operation(operation)
@@ -765,7 +764,7 @@ class Executor:
     def _create_git_url_reference(
         self, package: "Package"
     ) -> Dict[str, Union[str, Dict[str, str]]]:
-        reference = {
+        return {
             "url": package.source_url,
             "vcs_info": {
                 "vcs": "git",
@@ -773,8 +772,6 @@ class Executor:
                 "commit_id": package.source_resolved_reference,
             },
         }
-
-        return reference
 
     def _create_url_url_reference(
         self, package: "Package"
@@ -784,9 +781,7 @@ class Executor:
         if package.name in self._hashes:
             archive_info["hash"] = self._hashes[package.name]
 
-        reference = {"url": package.source_url, "archive_info": archive_info}
-
-        return reference
+        return {"url": package.source_url, "archive_info": archive_info}
 
     def _create_file_url_reference(
         self, package: "Package"
@@ -796,12 +791,10 @@ class Executor:
         if package.name in self._hashes:
             archive_info["hash"] = self._hashes[package.name]
 
-        reference = {
+        return {
             "url": Path(package.source_url).as_uri(),
             "archive_info": archive_info,
         }
-
-        return reference
 
     def _create_directory_url_reference(
         self, package: "Package"
@@ -811,9 +804,7 @@ class Executor:
         if package.develop:
             dir_info["editable"] = True
 
-        reference = {
+        return {
             "url": Path(package.source_url).as_uri(),
             "dir_info": dir_info,
         }
-
-        return reference

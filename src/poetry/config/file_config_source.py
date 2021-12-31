@@ -71,11 +71,11 @@ class FileConfigSource(ConfigSource):
         yield config
 
         try:
-            # Ensuring the file is only readable and writable
-            # by the current user
-            mode = 0o600
-
             if new_file:
+                # Ensuring the file is only readable and writable
+                # by the current user
+                mode = 0o600
+
                 self.file.touch(mode=mode)
 
             self.file.write(config)

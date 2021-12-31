@@ -55,7 +55,7 @@ To remove a repository (repo is a short alias for repositories):
         from poetry.config.config import int_normalizer
         from poetry.locations import CACHE_DIR
 
-        unique_config_values = {
+        return {
             "cache-dir": (
                 str,
                 lambda val: str(Path(val)),
@@ -94,8 +94,6 @@ To remove a repository (repo is a short alias for repositories):
                 None,
             ),
         }
-
-        return unique_config_values
 
     def handle(self) -> Optional[int]:
         from pathlib import Path

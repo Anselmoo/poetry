@@ -161,19 +161,17 @@ class Locker:
 
             if "marker" in info:
                 package.marker = parse_marker(info["marker"])
-            else:
-                # Compatibility for old locks
-                if "requirements" in info:
-                    dep = Dependency("foo", "0.0.0")
-                    for name, value in info["requirements"].items():
-                        if name == "python":
-                            dep.python_versions = value
-                        elif name == "platform":
-                            dep.platform = value
+            elif "requirements" in info:
+                dep = Dependency("foo", "0.0.0")
+                for name, value in info["requirements"].items():
+                    if name == "platform":
+                        dep.platform = value
 
-                    split_dep = dep.to_pep_508(False).split(";")
-                    if len(split_dep) > 1:
-                        package.marker = parse_marker(split_dep[1].strip())
+                    elif name == "python":
+                        dep.python_versions = value
+                split_dep = dep.to_pep_508(False).split(";")
+                if len(split_dep) > 1:
+                    package.marker = parse_marker(split_dep[1].strip())
 
             for dep_name, constraint in info.get("dependencies", {}).items():
 
@@ -453,15 +451,10 @@ class Locker:
         """
         content = self._local_config
 
-        relevant_content = {}
-        for key in self._relevant_keys:
-            relevant_content[key] = content.get(key)
-
-        content_hash = sha256(
+        relevant_content = {key: content.get(key) for key in self._relevant_keys}
+        return sha256(
             json.dumps(relevant_content, sort_keys=True).encode()
         ).hexdigest()
-
-        return content_hash
 
     def _get_lock_data(self) -> "TOMLDocument":
         if not self._lock.exists():
@@ -513,14 +506,27 @@ class Locker:
 
             constraint = inline_table()
 
-            if dependency.is_directory() or dependency.is_file():
+            if (
+                dependency.is_directory()
+                or not dependency.is_directory()
+                and dependency.is_file()
+            ):
                 constraint["path"] = dependency.path.as_posix()
 
                 if dependency.is_directory() and dependency.develop:
                     constraint["develop"] = True
-            elif dependency.is_url():
+            elif (
+                not dependency.is_directory()
+                and not dependency.is_file()
+                and dependency.is_url()
+            ):
                 constraint["url"] = dependency.url
-            elif dependency.is_vcs():
+            elif (
+                not dependency.is_directory()
+                and not dependency.is_file()
+                and not dependency.is_url()
+                and dependency.is_vcs()
+            ):
                 constraint[dependency.vcs] = dependency.source
 
                 if dependency.branch:
@@ -575,15 +581,10 @@ class Locker:
                         data["dependencies"][k].append(constraint)
 
         if package.extras:
-            extras = {}
-            for name, deps in package.extras.items():
-                # TODO: This should use dep.to_pep_508() once this is fixed
-                # https://github.com/python-poetry/poetry-core/pull/102
-                extras[name] = [
+            extras = {name: [
                     dep.base_pep_508_name if not dep.constraint.is_any() else dep.name
                     for dep in deps
-                ]
-
+                ] for name, deps in package.extras.items()}
             data["extras"] = extras
 
         if package.source_url:
